@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Layers, Github, Package, Palette } from 'lucide-react';
+import { Layers, Github, Package, Palette, LayoutTemplate } from 'lucide-react';
 import UIStylesExplorer from './components/UIStylesExplorer';
 import ProductsExplorer from './components/ProductsExplorer';
+import LandingPagesExplorer from './components/LandingPagesExplorer';
 
-type Tab = 'STYLES' | 'PRODUCTS';
+type Tab = 'STYLES' | 'PRODUCTS' | 'LANDING';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('STYLES');
@@ -49,6 +50,12 @@ const App: React.FC = () => {
              >
                <Package size={16} /> Products
              </button>
+             <button 
+               onClick={() => handleTabChange('LANDING')}
+               className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all flex items-center gap-2 ${activeTab === 'LANDING' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+             >
+               <LayoutTemplate size={16} /> Landing Pages
+             </button>
           </div>
 
           <div className="flex items-center gap-4">
@@ -59,27 +66,37 @@ const App: React.FC = () => {
         </div>
 
         {/* Mobile Tab Navigation (Sub-header) */}
-        <div className="md:hidden border-t border-gray-100 px-4 py-2 flex gap-4">
+        <div className="md:hidden border-t border-gray-100 px-4 py-2 flex gap-4 overflow-x-auto">
              <button 
                onClick={() => handleTabChange('STYLES')}
-               className={`flex-1 py-2 text-sm font-medium border-b-2 transition-all ${activeTab === 'STYLES' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'}`}
+               className={`flex-1 py-2 text-sm font-medium border-b-2 whitespace-nowrap transition-all ${activeTab === 'STYLES' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'}`}
              >
                UI Styles
              </button>
              <button 
                onClick={() => handleTabChange('PRODUCTS')}
-               className={`flex-1 py-2 text-sm font-medium border-b-2 transition-all ${activeTab === 'PRODUCTS' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'}`}
+               className={`flex-1 py-2 text-sm font-medium border-b-2 whitespace-nowrap transition-all ${activeTab === 'PRODUCTS' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'}`}
              >
                Products
+             </button>
+             <button 
+               onClick={() => handleTabChange('LANDING')}
+               className={`flex-1 py-2 text-sm font-medium border-b-2 whitespace-nowrap transition-all ${activeTab === 'LANDING' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'}`}
+             >
+               Landing Pages
              </button>
         </div>
       </header>
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeTab === 'STYLES' ? (
+        {activeTab === 'STYLES' && (
           <UIStylesExplorer initialStyleName={targetStyle} />
-        ) : (
+        )}
+        {activeTab === 'PRODUCTS' && (
           <ProductsExplorer onNavigateToStyle={handleNavigateToStyle} />
+        )}
+        {activeTab === 'LANDING' && (
+          <LandingPagesExplorer />
         )}
       </main>
 

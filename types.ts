@@ -40,4 +40,15 @@ export interface ProductData {
   "Key Considerations": string;
 }
 
+export interface LandingPageData {
+  "No": number;
+  "Pattern Name": string;
+  "Keywords": string;
+  "Section Order": string;
+  "Primary CTA Placement": string;
+  "Color Strategy": string;
+  "Recommended Effects": string;
+  "Conversion Optimization": string;
+}
+
 export type ViewState = 'LIST' | 'DETAIL';
