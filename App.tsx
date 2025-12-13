@@ -1,173 +1,86 @@
-import React, { useState, useMemo } from 'react';
-import { Search, Filter, Layers, Github, X } from 'lucide-react';
-import { UI_STYLES } from './constants';
-import { UIStyleData, ViewState } from './types';
-import StyleCard from './components/StyleCard';
-import LiveEditor from './components/LiveEditor';
+import React, { useState } from 'react';
+import { Layers, Github, Package, Palette } from 'lucide-react';
+import UIStylesExplorer from './components/UIStylesExplorer';
+import ProductsExplorer from './components/ProductsExplorer';
+
+type Tab = 'STYLES' | 'PRODUCTS';
 
 const App: React.FC = () => {
-  const [viewState, setViewState] = useState<ViewState>('LIST');
-  const [selectedStyle, setSelectedStyle] = useState<UIStyleData | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterComplexity, setFilterComplexity] = useState<string>('All');
+  const [activeTab, setActiveTab] = useState<Tab>('STYLES');
+  const [targetStyle, setTargetStyle] = useState<string | null>(null);
 
-  // Enhanced Filter Logic
-  const filteredStyles = useMemo(() => {
-    return UI_STYLES.filter((style) => {
-      // 1. Complexity Filter
-      const matchesComplexity = filterComplexity === 'All' || style.Complexity === filterComplexity;
-      if (!matchesComplexity) return false;
-
-      // 2. Search Filter (Token-based fuzzy-like matching)
-      const lowerSearchTerm = searchTerm.toLowerCase().trim();
-      if (!lowerSearchTerm) return true;
-
-      const searchTokens = lowerSearchTerm.split(/\s+/).filter(token => token.length > 0);
-      
-      // Combine all relevant fields into a single searchable string
-      // This allows for cross-field matching (e.g. "dark dashboard" matching style "Dark Mode" with best for "Dashboard")
-      const searchableContent = `
-        ${style["Style Category"]}
-        ${style.Keywords}
-        ${style["Best For"]}
-        ${style["Do Not Use For"]}
-        ${style.Type}
-        ${style["Era/Origin"]}
-        ${style["Primary Colors"]}
-        ${style["Effects & Animation"]}
-      `.toLowerCase();
-
-      // Check if every token in the search query exists in the style's content
-      const matchesSearch = searchTokens.every(token => searchableContent.includes(token));
-
-      return matchesSearch;
-    });
-  }, [searchTerm, filterComplexity]);
-
-  const handleStyleSelect = (style: UIStyleData) => {
-    setSelectedStyle(style);
-    setViewState('DETAIL');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handleNavigateToStyle = (styleName: string) => {
+    setTargetStyle(styleName);
+    setActiveTab('STYLES');
   };
 
-  const handleBack = () => {
-    setViewState('LIST');
-    setSelectedStyle(null);
+  const handleTabChange = (tab: Tab) => {
+    setActiveTab(tab);
+    // If navigating manually to styles, clear any specific target unless intended
+    if (tab === 'STYLES' && activeTab === 'STYLES') {
+      setTargetStyle(null);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-blue-100 selection:text-blue-900">
+    <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-blue-100 selection:text-blue-900 flex flex-col">
       
       {/* Navbar */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={handleBack}>
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => handleTabChange('STYLES')}>
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white">
               <Layers size={20} />
             </div>
             <span className="font-bold text-xl tracking-tight">UI<span className="text-blue-600">Explore</span></span>
           </div>
+          
+          {/* Desktop Tab Navigation */}
+          <div className="hidden md:flex items-center bg-gray-100 p-1 rounded-lg">
+             <button 
+               onClick={() => handleTabChange('STYLES')}
+               className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all flex items-center gap-2 ${activeTab === 'STYLES' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+             >
+               <Palette size={16} /> UI Styles
+             </button>
+             <button 
+               onClick={() => handleTabChange('PRODUCTS')}
+               className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all flex items-center gap-2 ${activeTab === 'PRODUCTS' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+             >
+               <Package size={16} /> Products
+             </button>
+          </div>
+
           <div className="flex items-center gap-4">
             <a href="#" className="text-gray-500 hover:text-gray-900 transition-colors">
               <Github size={20} />
             </a>
           </div>
         </div>
+
+        {/* Mobile Tab Navigation (Sub-header) */}
+        <div className="md:hidden border-t border-gray-100 px-4 py-2 flex gap-4">
+             <button 
+               onClick={() => handleTabChange('STYLES')}
+               className={`flex-1 py-2 text-sm font-medium border-b-2 transition-all ${activeTab === 'STYLES' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'}`}
+             >
+               UI Styles
+             </button>
+             <button 
+               onClick={() => handleTabChange('PRODUCTS')}
+               className={`flex-1 py-2 text-sm font-medium border-b-2 transition-all ${activeTab === 'PRODUCTS' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'}`}
+             >
+               Products
+             </button>
+        </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        {viewState === 'LIST' && (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {/* Hero Section */}
-            <div className="text-center max-w-2xl mx-auto mb-12">
-              <h1 className="text-4xl font-extrabold text-gray-900 mb-4 tracking-tight sm:text-5xl">
-                Discover Your <span className="text-blue-600">Digital Aesthetic</span>
-              </h1>
-              <p className="text-lg text-gray-600">
-                Browse, search, and experiment with the most popular UI design systems. View code snippets and preview styles instantly.
-              </p>
-            </div>
-
-            {/* Search & Filter Bar */}
-            <div className="mb-8 bg-gray-50 p-4 rounded-2xl border border-gray-200 flex flex-col md:flex-row gap-4 items-center shadow-sm">
-              <div className="relative flex-1 w-full">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                <input
-                  type="text"
-                  placeholder="Search styles (e.g., 'Clean SaaS', 'Dark Dashboard', 'Retro')..."
-                  className="w-full pl-10 pr-10 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder:text-gray-400"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                {searchTerm && (
-                  <button 
-                    onClick={() => setSearchTerm('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 hover:bg-gray-100 rounded-full transition-colors"
-                    title="Clear search"
-                  >
-                    <X size={16} />
-                  </button>
-                )}
-              </div>
-              
-              <div className="flex items-center gap-2 w-full md:w-auto">
-                <div className="relative w-full md:w-auto">
-                  <Filter size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
-                  <select 
-                    className="bg-white border border-gray-200 text-gray-700 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block w-full pl-9 pr-8 py-3 outline-none appearance-none cursor-pointer hover:border-gray-300 transition-colors"
-                    value={filterComplexity}
-                    onChange={(e) => setFilterComplexity(e.target.value)}
-                  >
-                    <option value="All">All Complexity</option>
-                    <option value="Low">Low Complexity</option>
-                    <option value="Medium">Medium Complexity</option>
-                    <option value="High">High Complexity</option>
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Grid */}
-            {filteredStyles.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredStyles.map((style) => (
-                  <StyleCard 
-                    key={style.STT} 
-                    style={style} 
-                    onClick={() => handleStyleSelect(style)} 
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-20 bg-gray-50 rounded-3xl border border-dashed border-gray-300">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white shadow-sm mb-4">
-                  <Search size={32} className="text-gray-400" />
-                </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-1">No styles found</h3>
-                <p className="text-gray-500 max-w-xs mx-auto">
-                  We couldn't find any styles matching "{searchTerm}". Try adjusting your terms or filters.
-                </p>
-                <button 
-                  onClick={() => {setSearchTerm(''); setFilterComplexity('All');}}
-                  className="mt-6 px-6 py-2 bg-white border border-gray-300 shadow-sm rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-all"
-                >
-                  Clear all filters
-                </button>
-              </div>
-            )}
-          </div>
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {activeTab === 'STYLES' ? (
+          <UIStylesExplorer initialStyleName={targetStyle} />
+        ) : (
+          <ProductsExplorer onNavigateToStyle={handleNavigateToStyle} />
         )}
-
-        {viewState === 'DETAIL' && selectedStyle && (
-          <div className="animate-in fade-in zoom-in-95 duration-300">
-             <LiveEditor style={selectedStyle} onBack={handleBack} />
-          </div>
-        )}
-
       </main>
 
       <footer className="bg-white border-t border-gray-200 mt-auto">
