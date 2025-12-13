@@ -1,0 +1,5 @@
+{
+  "name": "UI Style Explorer",
+  "description": "An interactive catalog of UI design systems allowing users to search, view, and live-edit code examples for various aesthetic styles.",
+  "requestFramePermissions": []
+}
