@@ -1,26 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { UIStyleData } from '../types';
-import { RefreshCw, Code, Eye, Copy, Check, Maximize, Minimize, Layers, Info } from 'lucide-react';
+import { RefreshCw, Code, Eye, Copy, Check, Maximize, Minimize, Layers, Info, Wand2, Terminal, CheckSquare, Palette } from 'lucide-react';
 import Editor from 'react-simple-code-editor';
 import Prism from 'prismjs';
+import { STYLE_PROMPTS } from '../constants';
 
 interface LiveEditorProps {
   style: UIStyleData;
   onBack: () => void;
 }
 
-const DetailItem = ({ label, value, className = '' }: { label: string; value: string; className?: string }) => (
+const DetailItem = ({ label, value, className = '', icon: Icon }: { label: string; value: string; className?: string; icon?: React.ElementType }) => (
   <div className={`p-3 bg-white rounded-lg border border-gray-100 shadow-sm ${className}`}>
-    <span className="block text-gray-400 text-xs uppercase font-bold mb-1 tracking-wider">{label}</span>
-    <p className="font-medium text-gray-900 text-sm leading-relaxed">{value}</p>
+    <div className="flex items-center gap-1.5 mb-1">
+        {Icon && <Icon size={12} className="text-blue-500" />}
+        <span className="block text-gray-400 text-xs uppercase font-bold tracking-wider">{label}</span>
+    </div>
+    <p className="font-medium text-gray-900 text-sm leading-relaxed whitespace-pre-line">{value}</p>
   </div>
 );
 
 const LiveEditor: React.FC<LiveEditorProps> = ({ style, onBack }) => {
   const [code, setCode] = useState(style.sampleCode || '<!-- No sample code available -->');
   const [copied, setCopied] = useState(false);
+  const [promptCopied, setPromptCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'preview' | 'code'>('preview');
   const [isFullScreen, setIsFullScreen] = useState(false);
+  
+  const promptData = STYLE_PROMPTS[style["Style Category"]];
 
   // Reset code when style changes
   useEffect(() => {
@@ -31,6 +38,14 @@ const LiveEditor: React.FC<LiveEditorProps> = ({ style, onBack }) => {
     navigator.clipboard.writeText(code);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleCopyPrompt = () => {
+    if (promptData?.aiPrompt) {
+        navigator.clipboard.writeText(promptData.aiPrompt);
+        setPromptCopied(true);
+        setTimeout(() => setPromptCopied(false), 2000);
+    }
   };
 
   const handleReset = () => {
@@ -65,7 +80,19 @@ const LiveEditor: React.FC<LiveEditorProps> = ({ style, onBack }) => {
              <button onClick={onBack} className="text-sm text-gray-500 hover:text-black mb-1 hover:underline flex items-center gap-1">
               &larr; Back to list
             </button>
-            <h2 className="text-2xl font-bold text-gray-900">{style["Style Category"]} <span className="text-gray-400 font-light ml-2">Playground</span></h2>
+            <div className="flex items-center gap-3">
+                <h2 className="text-2xl font-bold text-gray-900">{style["Style Category"]} <span className="text-gray-400 font-light ml-2">Playground</span></h2>
+                {promptData && (
+                    <button 
+                        onClick={handleCopyPrompt}
+                        className="flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full text-xs font-bold hover:shadow-lg hover:scale-105 transition-all"
+                        title="Copy AI Generation Prompt"
+                    >
+                        {promptCopied ? <Check size={12} /> : <Wand2 size={12} />}
+                        {promptCopied ? "Prompt Copied!" : "Copy AI Prompt"}
+                    </button>
+                )}
+            </div>
           </div>
           
           <div className="flex items-center gap-2">
@@ -166,7 +193,7 @@ const LiveEditor: React.FC<LiveEditorProps> = ({ style, onBack }) => {
 
       {/* Style Metadata Footer */}
       {!isFullScreen && (
-        <div className="mt-6 flex-shrink-0 bg-gray-50 p-6 rounded-xl border border-gray-200 overflow-y-auto max-h-[300px] animate-in fade-in slide-in-from-bottom-4 duration-300 custom-scrollbar">
+        <div className="mt-6 flex-shrink-0 bg-gray-50 p-6 rounded-xl border border-gray-200 overflow-y-auto max-h-[350px] animate-in fade-in slide-in-from-bottom-4 duration-300 custom-scrollbar">
            <div className="flex items-center gap-2 mb-4 pb-2 border-b border-gray-200">
               <Info size={18} className="text-blue-600" />
               <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide">Style Specifications</h3>
@@ -194,6 +221,20 @@ const LiveEditor: React.FC<LiveEditorProps> = ({ style, onBack }) => {
               <DetailItem label="Dark Mode" value={style["Dark Mode ✓"]} />
               <DetailItem label="Conversion" value={style["Conversion-Focused"]} />
               <DetailItem label="Frameworks" value={style["Framework Compatibility"]} className="sm:col-span-2" />
+
+              {/* Technical Details from AI Prompts (if available) */}
+              {promptData && (
+                <>
+                    <div className="col-span-full border-t border-gray-200 my-2 pt-4">
+                        <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wide mb-3 flex items-center gap-2">
+                            <Terminal size={14} className="text-purple-600" /> Technical Implementation
+                        </h4>
+                    </div>
+                    <DetailItem label="CSS Keywords" value={promptData.technicalKeywords} className="sm:col-span-2 md:col-span-4 bg-slate-50 border-slate-200" icon={Code} />
+                    <DetailItem label="Implementation Checklist" value={promptData.checklist.replace(/, /g, '\n')} className="sm:col-span-2 md:col-span-2 bg-green-50 border-green-200" icon={CheckSquare} />
+                    <DetailItem label="Design Variables" value={promptData.variables.replace(/, /g, '\n')} className="sm:col-span-2 md:col-span-2 bg-blue-50 border-blue-200" icon={Palette} />
+                </>
+              )}
            </div>
         </div>
       )}
