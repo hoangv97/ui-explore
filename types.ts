@@ -65,4 +65,17 @@ export interface TypographyData {
   "Notes": string;
 }
 
+export interface ColorData {
+  "No": number;
+  "Product Type": string;
+  "Keywords": string;
+  "Primary (Hex)": string;
+  "Secondary (Hex)": string;
+  "CTA (Hex)": string;
+  "Background (Hex)": string;
+  "Text (Hex)": string;
+  "Border (Hex)": string;
+  "Notes": string;
+}
+
 export type ViewState = 'LIST' | 'DETAIL';

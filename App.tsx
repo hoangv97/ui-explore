@@ -4,8 +4,9 @@ import UIStylesExplorer from './components/UIStylesExplorer';
 import ProductsExplorer from './components/ProductsExplorer';
 import LandingPagesExplorer from './components/LandingPagesExplorer';
 import TypographyExplorer from './components/TypographyExplorer';
+import ColorsExplorer from './components/ColorsExplorer';
 
-type Tab = 'STYLES' | 'PRODUCTS' | 'LANDING' | 'TYPOGRAPHY';
+type Tab = 'STYLES' | 'PRODUCTS' | 'LANDING' | 'TYPOGRAPHY' | 'COLORS';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('STYLES');
@@ -63,6 +64,12 @@ const App: React.FC = () => {
              >
                <Type size={16} /> Typography
              </button>
+             <button 
+               onClick={() => handleTabChange('COLORS')}
+               className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all flex items-center gap-2 ${activeTab === 'COLORS' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+             >
+               <div className="w-4 h-4 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 border border-black/10 shadow-sm"></div> Colors
+             </button>
           </div>
 
           <div className="flex items-center gap-4">
@@ -98,6 +105,12 @@ const App: React.FC = () => {
              >
                Fonts
              </button>
+             <button 
+               onClick={() => handleTabChange('COLORS')}
+               className={`flex-1 py-2 text-sm font-medium border-b-2 whitespace-nowrap transition-all ${activeTab === 'COLORS' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'}`}
+             >
+               Colors
+             </button>
         </div>
       </header>
 
@@ -113,6 +126,9 @@ const App: React.FC = () => {
         )}
         {activeTab === 'TYPOGRAPHY' && (
           <TypographyExplorer />
+        )}
+        {activeTab === 'COLORS' && (
+          <ColorsExplorer />
         )}
       </main>
 
