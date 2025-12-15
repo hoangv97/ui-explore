@@ -51,4 +51,18 @@ export interface LandingPageData {
   "Conversion Optimization": string;
 }
 
+export interface TypographyData {
+  "STT": number;
+  "Font Pairing Name": string;
+  "Category": string;
+  "Heading Font": string;
+  "Body Font": string;
+  "Mood/Style Keywords": string;
+  "Best For": string;
+  "Google Fonts URL": string;
+  "CSS Import": string;
+  "Tailwind Config": string;
+  "Notes": string;
+}
+
 export type ViewState = 'LIST' | 'DETAIL';

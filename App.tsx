@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Layers, Github, Package, Palette, LayoutTemplate } from 'lucide-react';
+import { Layers, Github, Package, Palette, LayoutTemplate, Type } from 'lucide-react';
 import UIStylesExplorer from './components/UIStylesExplorer';
 import ProductsExplorer from './components/ProductsExplorer';
 import LandingPagesExplorer from './components/LandingPagesExplorer';
+import TypographyExplorer from './components/TypographyExplorer';
 
-type Tab = 'STYLES' | 'PRODUCTS' | 'LANDING';
+type Tab = 'STYLES' | 'PRODUCTS' | 'LANDING' | 'TYPOGRAPHY';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('STYLES');
@@ -56,6 +57,12 @@ const App: React.FC = () => {
              >
                <LayoutTemplate size={16} /> Landing Pages
              </button>
+             <button 
+               onClick={() => handleTabChange('TYPOGRAPHY')}
+               className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all flex items-center gap-2 ${activeTab === 'TYPOGRAPHY' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+             >
+               <Type size={16} /> Typography
+             </button>
           </div>
 
           <div className="flex items-center gap-4">
@@ -66,7 +73,7 @@ const App: React.FC = () => {
         </div>
 
         {/* Mobile Tab Navigation (Sub-header) */}
-        <div className="md:hidden border-t border-gray-100 px-4 py-2 flex gap-4 overflow-x-auto">
+        <div className="md:hidden border-t border-gray-100 px-4 py-2 flex gap-4 overflow-x-auto custom-scrollbar">
              <button 
                onClick={() => handleTabChange('STYLES')}
                className={`flex-1 py-2 text-sm font-medium border-b-2 whitespace-nowrap transition-all ${activeTab === 'STYLES' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'}`}
@@ -83,7 +90,13 @@ const App: React.FC = () => {
                onClick={() => handleTabChange('LANDING')}
                className={`flex-1 py-2 text-sm font-medium border-b-2 whitespace-nowrap transition-all ${activeTab === 'LANDING' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'}`}
              >
-               Landing Pages
+               Landing
+             </button>
+             <button 
+               onClick={() => handleTabChange('TYPOGRAPHY')}
+               className={`flex-1 py-2 text-sm font-medium border-b-2 whitespace-nowrap transition-all ${activeTab === 'TYPOGRAPHY' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'}`}
+             >
+               Fonts
              </button>
         </div>
       </header>
@@ -97,6 +110,9 @@ const App: React.FC = () => {
         )}
         {activeTab === 'LANDING' && (
           <LandingPagesExplorer />
+        )}
+        {activeTab === 'TYPOGRAPHY' && (
+          <TypographyExplorer />
         )}
       </main>
 
